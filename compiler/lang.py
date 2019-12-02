@@ -129,11 +129,12 @@ class AssignmentScope(Entity):
 		self.target = target
 		self.values = values
 
-class Behavior(Entity):
-	def __init__(self, target, animation):
-		super(Behavior, self).__init__()
+class On(Entity):
+	def __init__(self, type, target, component):
+		super(On, self).__init__()
+		self.type = type
 		self.target = target
-		self.animation = animation
+		self.component = component
 
 class Signal(Entity):
 	def __init__(self, name):

@@ -96,9 +96,9 @@ def handle_id_declaration(s, l, t):
 	#print "id>", t
 	return component(lang.IdAssignment(t[0]))
 
-def handle_behavior_declaration(s, l, t):
-	#print "behavior>", t
-	return component(lang.Behavior(t[0], t[1]))
+def handle_on_declaration(s, l, t):
+	#print("on>", t)
+	return component(lang.On(t[0], t[1], t[2]))
 
 def handle_signal_declaration(s, l, t):
 	return component(lang.Signal(t[0]))
@@ -276,8 +276,8 @@ method_declaration.setParseAction(handle_method_declaration)
 method_declaration_qml = Optional(Keyword("async")) + Keyword("function") - Group(nested_identifier_lvalue) - Group(Suppress("(") - Optional(delimitedList(identifier, ",")) - Suppress(")") ) - code
 method_declaration_qml.setParseAction(handle_method_declaration)
 
-behavior_declaration = Keyword("Behavior").suppress() - Keyword("on").suppress() - Group(delimitedList(nested_identifier_lvalue, ',')) - Suppress("{") - component_declaration - Suppress("}")
-behavior_declaration.setParseAction(handle_behavior_declaration)
+on_declaration = component_type + Keyword("on").suppress() + Group(delimitedList(nested_identifier_lvalue, ',')) + Suppress("{") + component_declaration + Suppress("}")
+on_declaration.setParseAction(handle_on_declaration)
 
 json_value = Forward()
 json_object = Suppress("{") + delimitedList(Group((unquoted_string_value | identifier) + Suppress(":") + json_value) | empty, Suppress(";") | Suppress(",")) + Suppress('}')
@@ -291,7 +291,7 @@ list_element_declaration.setParseAction(handle_list_element)
 
 import_statement = Keyword("import") - restOfLine
 
-scope_declaration = list_element_declaration | behavior_declaration | signal_declaration | alias_property_declaration | enum_property_declaration | const_property_declaration | property_declaration | id_declaration | assign_declaration | assign_component_declaration | component_declaration | method_declaration | method_declaration_qml | assign_scope
+scope_declaration = list_element_declaration | on_declaration | signal_declaration | alias_property_declaration | enum_property_declaration | const_property_declaration | property_declaration | id_declaration | assign_declaration | assign_component_declaration | component_declaration | method_declaration | method_declaration_qml | assign_scope
 component_scope = (Suppress("{") + Group(ZeroOrMore(scope_declaration)) + Suppress("}"))
 
 component_declaration << (component_type + component_scope)

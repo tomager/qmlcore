@@ -19,7 +19,7 @@ class component_generator(object):
 		self.properties = []
 		self.enums = {}
 		self.assignments = {}
-		self.animations = {}
+		self.ons = {}
 		self.package = get_package(name)
 		self.base_type = None
 		self.children = []
@@ -127,12 +127,12 @@ class component_generator(object):
 		elif t is lang.Component:
 			value = self.create_component_generator(child)
 			self.children.append(value)
-		elif t is lang.Behavior:
+		elif t is lang.On:
 			for target in child.target:
-				if target in self.animations:
+				if (child.type, target) in self.ons:
 					raise Exception("duplicate animation on property " + target)
-				value = self.create_component_generator(child.animation, "<anonymous-animation>")
-				self.animations[target] = value
+				value = self.create_component_generator(child.component, "<anonymous-animation>")
+				self.ons[(child.type, target)] = value
 		elif t is lang.Method:
 			for name in child.name:
 				if name == 'constructor':
@@ -205,8 +205,8 @@ class component_generator(object):
 
 	def generate_animations(self, registry, parent):
 		r = []
-		for name, animation in self.animations.items():
-			var = "behavior_%s_on_%s" %(escape(parent), escape(name))
+		for (component_type, name), animation in self.ons.items():
+			var = "%s_%s_on_%s" %(component_type.lower(), escape(parent), escape(name))
 			r.append("\tvar %s = new %s(%s)" %(var, registry.find_component(self.package, animation.component.name, mangle = True), parent))
 			r.append("\tvar %s$c = { %s: %s }" %(var, var, var))
 			r.append(self.call_create(registry, 1, var, animation, var + '$c'))
