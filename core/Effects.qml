@@ -11,10 +11,11 @@ Object {
 	property lazy shadow : Shadow { }	///< object property for the shadow adjusting
 
 	/// @private
-	function _addStyle(array, property, style, units) {
-		var value = this[property]
+        function _addStyle(array, property_, style, units) {
+	// ** property is a keyword / reserved identifier, but pyparsing treats it as a matched identifier..
+		var value = this[property_]
 		if (value)
-			array.push((style || property) + '(' + value + (units || '') + ') ')
+			array.push((style || property_) + '(' + value + (units || '') + ') ')
 	}
 
 	/// @private

@@ -1,6 +1,7 @@
 Object {
 	property bool delayed; 		///< delays update to the next tick
-	property string property; 	///< target property
+	// *** property is a reserved keyword, not treated as such by pyparsing
+	property string property_; 	///< target property
 	property Object target; 	///< target object
 	property bool when: true;	///< assign value to target when this condition met
 	property var value; 		///< any value
@@ -13,11 +14,11 @@ Object {
 	}
 
 	function _updateTargetImpl() {
-		$core.assign(this.target, this.property, this.value)
+		$core.assign(this.target, this.property_, this.value)
 	}
 
 	onTargetChanged, onValueChanged, onWhenChanged: {
-		if (this.target && this.when && this.property)
+		if (this.target && this.when && this.property_)
 			this._updateTarget()
 	}
 }

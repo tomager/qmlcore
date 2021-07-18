@@ -9,7 +9,8 @@ Object {
 	property bool running: false;			///< currently running
 	property string easing: "ease";			///< easing function
 	property Object target;					///< target object
-	property string property;				///< target object property
+	// *** property is a keyword, but not treated as such by pyparsing
+	property string property_;				///< target object property
 	property variant from;					///< used in declarative animation inside SequentialAnimation, starting value
 	property variant to;					///< used in declarative animation inside SequentialAnimation, destination value
 
@@ -34,7 +35,7 @@ Object {
 
 	function _updateAnimation() {
 		if (this.target)
-			this.target.updateAnimation(this.property, this)
+			this.target.updateAnimation(this.property_, this)
 	}
 
 	/// @private

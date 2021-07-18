@@ -6,6 +6,7 @@ from builtins import object, str
 
 import compiler.doc.json
 import compiler.grammar
+import compiler.parser
 import compiler.manifest
 from compiler.manifest import merge_properties
 import compiler.js
@@ -16,6 +17,7 @@ import pickle
 import json
 from multiprocessing import Pool, cpu_count
 import sys
+import traceback
 from io import open
 
 try:
@@ -64,7 +66,7 @@ def parse_qml_file(cache, com, path):
 	else:
 		print("parsing", path, "...", com, file=sys.stderr)
 		try:
-			tree = compiler.grammar.parse(data)
+			tree = compiler.parser.parse(data, fn=path)
 			cache.write(com, h, tree)
 			return tree, data
 		except Exception as ex:
@@ -225,6 +227,7 @@ class Compiler(object):
 			return r
 		appcode += write_properties('$manifest', self.root_manifest_props)
 
+		sys.exit(2) # * debug logic
 		appcode += "var " + generator.generate()
 		appcode += generator.generate_startup(namespace, self.app)
 		appcode = appcode.replace('/* ${init.js} */', init_js)
@@ -324,11 +327,14 @@ def compile_qml(output_dir, root, project_dirs, root_manifest, app, platforms = 
 				if hasattr(ex, 'line'):
 					msg += '\n' + ex.line
 				print(msg, file=sys.stderr)
+				exc_type, exc_value, exc_traceback = sys.exc_info()
+				traceback.print_exception(exc_type, exc_value, exc_traceback,
+							  limit=2, file=sys.stdout)
 				if verbose:
 					raise
 				sys.exit(1)
 
-			import time, traceback
+			import time
 			traceback.print_exc()
 			time.sleep(1)
 			continue
